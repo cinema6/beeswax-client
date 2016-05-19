@@ -1,0 +1,37 @@
+{
+  "name": "beeswax-client",
+  "version": "0.1.0",
+  "description": "Node.js wrapper for the Beeswax API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cinema6/beeswax-client.git"
+  },
+  "keywords": [
+    "beeswax",
+    "advertising",
+    "ads",
+    "rest"
+  ],
+  "author": "Reelcontent, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cinema6/beeswax-client/issues"
+  },
+  "homepage": "https://github.com/cinema6/beeswax-client#readme",
+  "dependencies": {
+    "bluebird": "^3.4.0",
+    "request-promise": "^3.0.0",
+    "ssl-root-cas": "^1.1.10"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "jasmine": "^2.4.1"
+  }
+}
