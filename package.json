@@ -24,6 +24,7 @@
   "homepage": "https://github.com/cinema6/beeswax-client#readme",
   "dependencies": {
     "bluebird": "^3.4.0",
+    "request": "^2.72.0",
     "request-promise": "^3.0.0",
     "ssl-root-cas": "^1.1.10"
   },

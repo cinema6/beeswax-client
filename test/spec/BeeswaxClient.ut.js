@@ -702,4 +702,39 @@ describe('BeeswaxClient', function() {
             }).done(done);
         });
     });
+
+    describe('uploadCreativeAsset', function() {
+        var beeswax , req;
+        beforeEach(function() {
+            req = {
+                sourceUrl : 'https://abc/def.jpeg'
+            };
+            beeswax = new BeeswaxClient(mockOps);
+            spyOn(beeswax, 'request');
+        });
+
+        it('rejects if there is no sourceUrl',function(done){
+            beeswax.uploadCreativeAsset({})
+            .then(done.fail, function(e){
+                expect(e.message)
+                .toEqual('uploadCreativeAsset params requires a sourceUrl property.');
+            })
+            .then(done);
+        });
+
+        it('rejects if it cannot get the content-length',function(done){
+            beeswax.request.and.callFake(function(){
+                return Promise.resolve({});
+            });
+            
+            beeswax.uploadCreativeAsset(req)
+            .then(done.fail,function(e){
+                expect(e.message).toEqual(
+                   'Unable to detect content-length of sourceUrl: https://abc/def.jpeg' 
+                );
+            })
+            .then(done);
+        });
+    });
+        
 });
