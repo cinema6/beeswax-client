@@ -1,11 +1,12 @@
 describe('BeeswaxClient', function() {
-    var util, Promise, BeeswaxClient, rp, rpErrors, mockOps;
+    var util, Promise, BeeswaxClient, rp, rpErrors, mockOps, request;
 
     beforeEach(function() {
         util            = require('util');
         Promise         = require('bluebird');
         rp              = require('request-promise');
         rpErrors        = require('request-promise/errors');
+        request         = require('request');
         BeeswaxClient   = require('../../lib/BeeswaxClient');
         
         spyOn(rp, 'jar').and.returnValue({ cookies: 'yum' });
@@ -711,6 +712,8 @@ describe('BeeswaxClient', function() {
             };
             beeswax = new BeeswaxClient(mockOps);
             spyOn(beeswax, 'request');
+            spyOn(request,'head');
+            spyOn(request,'post');
         });
 
         it('rejects if there is no sourceUrl',function(done){
@@ -722,11 +725,11 @@ describe('BeeswaxClient', function() {
             .then(done);
         });
 
-        it('rejects if it cannot get the content-length',function(done){
-            beeswax.request.and.callFake(function(){
-                return Promise.resolve({});
+        it('rejects if head does not get the content-length',function(done){
+            request.head.and.callFake(function(opts,cb){
+                cb(null,{ statusCode : 200, headers : {} },{});
             });
-            
+
             beeswax.uploadCreativeAsset(req)
             .then(done.fail,function(e){
                 expect(e.message).toEqual(
@@ -734,6 +737,55 @@ describe('BeeswaxClient', function() {
                 );
             })
             .then(done);
+        });
+
+        it('returns data about the asset when everything works',function(done){
+            request.head.and.callFake(function(opts,cb){
+                cb(null,{ statusCode : 200, headers : { 'content-length' : '100' } },{});
+            });
+
+            beeswax.request.and.callFake(function(method,opts){
+                if ((method === 'post') && (opts.url.match(/\/creative_asset$/))){
+                    return Promise.resolve({
+                        success: true,
+                        payload:  {
+                            id : 666
+                        }
+                    });
+                }
+                else
+                if ((method === 'get') && (opts.url.match(/\/creative_asset\/666/))){
+                    return Promise.resolve({
+                        success: true,
+                        payload:  [{
+                            id  : 666,
+                            foo : 'bar'
+                        }]
+                    });
+                }
+                return Promise.reject(new Error('Invalid request call.'));
+            });
+
+            request.post.and.callFake(function(opts,cb){
+                var body;
+                if (opts.url.match(/\/creative_asset\/upload/)){
+                    body = JSON.stringify({
+                        success: true,
+                        payload:  {
+                            id : 666
+                        }
+                    });
+                    return cb(null,{ statusCode : 200, headers : { }},body);
+                }
+           
+                cb(new Error('Bad request post.'));
+            });
+
+            beeswax.uploadCreativeAsset(req)
+            .then(function(result){
+                expect(result).toEqual({id : 666, foo : 'bar' }); 
+            })
+            .then(done,done.fail);
         });
     });
         
