@@ -91,6 +91,27 @@ describe('BeeswaxClient', function() {
                 edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/creative', 'creative_id']),
                 delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/creative', 'creative_id']),
             });
+            expect(beeswax.lineItems).toEqual({
+                find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/line_item', 'line_item_id']),
+                query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/line_item']),
+                create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/line_item', 'line_item_id']),
+                edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/line_item', 'line_item_id']),
+                delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/line_item', 'line_item_id']),
+            });
+            expect(beeswax.creativeLineItems).toEqual({
+                find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/creative_line_item', 'cli_id']),
+                query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/creative_line_item']),
+                create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/creative_line_item', 'cli_id']),
+                edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/creative_line_item', 'cli_id']),
+                delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/creative_line_item', 'cli_id']),
+            });
+            expect(beeswax.targetingTemplates).toEqual({
+                find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
+                query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/targeting_template']),
+                create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
+                edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
+                delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
+            });
         });
         
         it('should fail if an email + password are not passed', function() {
