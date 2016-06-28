@@ -1,6 +1,6 @@
 {
   "name": "beeswax-client",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Node.js wrapper for the Beeswax API.",
   "main": "index.js",
   "scripts": {
