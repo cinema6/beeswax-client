@@ -37,7 +37,7 @@ describe('BeeswaxClient', function() {
 
             boundFns = [];
             
-            ['_find', '_query', '_create', '_edit', '_delete'].forEach(function(method) {
+            ['_find', '_query', '_queryAll', '_create', '_edit', '_delete'].forEach(function(method) {
                 spyOn(BeeswaxClient.prototype[method], 'bind').and.callFake(function() {
                     var boundFn = Function.prototype.bind.apply(BeeswaxClient.prototype[method], arguments);
 
@@ -73,6 +73,7 @@ describe('BeeswaxClient', function() {
             expect(beeswax.advertisers).toEqual({
                 find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/advertiser', 'advertiser_id']),
                 query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/advertiser']),
+                queryAll: getBoundFn(BeeswaxClient.prototype._queryAll, [beeswax, '/rest/advertiser', 'advertiser_id']),
                 create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/advertiser', 'advertiser_id']),
                 edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/advertiser', 'advertiser_id']),
                 delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/advertiser', 'advertiser_id']),
@@ -80,6 +81,7 @@ describe('BeeswaxClient', function() {
             expect(beeswax.campaigns).toEqual({
                 find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/campaign', 'campaign_id']),
                 query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/campaign']),
+                queryAll: getBoundFn(BeeswaxClient.prototype._queryAll, [beeswax, '/rest/campaign', 'campaign_id']),
                 create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/campaign', 'campaign_id']),
                 edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/campaign', 'campaign_id']),
                 delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/campaign', 'campaign_id']),
@@ -87,6 +89,7 @@ describe('BeeswaxClient', function() {
             expect(beeswax.creatives).toEqual({
                 find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/creative', 'creative_id']),
                 query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/creative']),
+                queryAll: getBoundFn(BeeswaxClient.prototype._queryAll, [beeswax, '/rest/creative', 'creative_id']),
                 create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/creative', 'creative_id']),
                 edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/creative', 'creative_id']),
                 delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/creative', 'creative_id']),
@@ -94,6 +97,7 @@ describe('BeeswaxClient', function() {
             expect(beeswax.lineItems).toEqual({
                 find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/line_item', 'line_item_id']),
                 query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/line_item']),
+                queryAll: getBoundFn(BeeswaxClient.prototype._queryAll, [beeswax, '/rest/line_item', 'line_item_id']),
                 create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/line_item', 'line_item_id']),
                 edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/line_item', 'line_item_id']),
                 delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/line_item', 'line_item_id']),
@@ -101,6 +105,7 @@ describe('BeeswaxClient', function() {
             expect(beeswax.creativeLineItems).toEqual({
                 find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/creative_line_item', 'cli_id']),
                 query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/creative_line_item']),
+                queryAll: getBoundFn(BeeswaxClient.prototype._queryAll, [beeswax, '/rest/creative_line_item', 'cli_id']),
                 create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/creative_line_item', 'cli_id']),
                 edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/creative_line_item', 'cli_id']),
                 delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/creative_line_item', 'cli_id']),
@@ -108,6 +113,7 @@ describe('BeeswaxClient', function() {
             expect(beeswax.targetingTemplates).toEqual({
                 find: getBoundFn(BeeswaxClient.prototype._find, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
                 query: getBoundFn(BeeswaxClient.prototype._query, [beeswax, '/rest/targeting_template']),
+                queryAll: getBoundFn(BeeswaxClient.prototype._queryAll, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
                 create: getBoundFn(BeeswaxClient.prototype._create, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
                 edit: getBoundFn(BeeswaxClient.prototype._edit, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
                 delete: getBoundFn(BeeswaxClient.prototype._delete, [beeswax, '/rest/targeting_template', 'targeting_template_id']),
@@ -435,6 +441,136 @@ describe('BeeswaxClient', function() {
             }).catch(function(error) {
                 expect(error).toEqual('I GOT A PROBLEM');
                 expect(beeswax.request).toHaveBeenCalled();
+            }).done(done);
+        });
+    });
+    
+    describe('_queryAll', function() {
+        var beeswax;
+        beforeEach(function() {
+            beeswax = new BeeswaxClient(mockOps);
+            spyOn(beeswax, 'request').and.callFake(function(method, opts) {
+                var resp = { success: true, payload: [] }, i;
+                
+                if (opts.body.offset < 150) {
+                    for (i = opts.body.offset; i < opts.body.offset + 50; i++) {
+                        resp.payload.push({ id: i, name: 'item #' + i });
+                    }
+                } else {
+                    for (i = opts.body.offset; i < opts.body.offset + 25; i++) {
+                        resp.payload.push({ id: i, name: 'item #' + i });
+                    }
+                }
+                return Promise.resolve(resp);
+            });
+        });
+        
+        it('should recursively fetch items until it receives less than its batch size', function(done) {
+            beeswax._queryAll('/rest/campaign', 'campaign_id', { campaign_name: 'foobar' }).then(function(body) {
+                expect(body).toEqual({ success: true, payload: jasmine.any(Array) });
+                expect(body.payload.length).toBe(175);
+                body.payload.forEach(function(item, idx) {
+                    expect(item).toEqual({ id: idx, name: 'item #' + idx });
+                });
+                expect(beeswax.request.calls.count()).toBe(4);
+                beeswax.request.calls.allArgs().forEach(function(argArr, idx) {
+                    expect(argArr).toEqual(['get', {
+                        url: 'https://stinger.ut.api.beeswax.com/rest/campaign',
+                        body: {
+                            campaign_name: 'foobar',
+                            offset: idx * 50,
+                            rows: 50,
+                            sort_by: 'campaign_id'
+                        }
+                    }]);
+                });
+            }).catch(function(error) {
+                expect(error).not.toBeDefined();
+            }).done(done);
+        });
+        
+        it('should handle an undefined body', function(done) {
+            beeswax._queryAll('/rest/campaign', 'campaign_id').then(function(body) {
+                expect(body).toEqual({ success: true, payload: jasmine.any(Array) });
+                expect(body.payload.length).toBe(175);
+                expect(beeswax.request.calls.count()).toBe(4);
+                beeswax.request.calls.allArgs().forEach(function(argArr, idx) {
+                    expect(argArr).toEqual(['get', {
+                        url: 'https://stinger.ut.api.beeswax.com/rest/campaign',
+                        body: {
+                            offset: idx * 50,
+                            rows: 50,
+                            sort_by: 'campaign_id'
+                        }
+                    }]);
+                });
+            }).catch(function(error) {
+                expect(error).not.toBeDefined();
+            }).done(done);
+        });
+        
+        it('should override pagination params', function(done) {
+            beeswax._queryAll('/rest/campaign', 'campaign_id', { rows: 13, offset: 500, sort_by: 'campaign_name' }).then(function(body) {
+                expect(body).toEqual({ success: true, payload: jasmine.any(Array) });
+                expect(body.payload.length).toBe(175);
+                expect(beeswax.request.calls.count()).toBe(4);
+                beeswax.request.calls.allArgs().forEach(function(argArr, idx) {
+                    expect(argArr).toEqual(['get', {
+                        url: 'https://stinger.ut.api.beeswax.com/rest/campaign',
+                        body: {
+                            offset: idx * 50,
+                            rows: 50,
+                            sort_by: 'campaign_id'
+                        }
+                    }]);
+                });
+            }).catch(function(error) {
+                expect(error).not.toBeDefined();
+            }).done(done);
+        });
+        
+        it('should handle getting only a few items on the first request', function(done) {
+            beeswax.request.and.returnValue(Promise.resolve({
+                success: true,
+                payload: [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }]
+            }));
+            beeswax._queryAll('/rest/campaign', 'campaign_id', { rows: 13, offset: 500, sort_by: 'campaign_name' }).then(function(body) {
+                expect(body).toEqual({ success: true, payload: [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }] });
+                expect(beeswax.request.calls.count()).toBe(1);
+            }).catch(function(error) {
+                expect(error).not.toBeDefined();
+            }).done(done);
+        });
+        
+        it('should handle getting an empty body on the first request', function(done) {
+            beeswax.request.and.returnValue(Promise.resolve({ success: true, payload: [] }));
+            beeswax._queryAll('/rest/campaign', 'campaign_id', { rows: 13, offset: 500, sort_by: 'campaign_name' }).then(function(body) {
+                expect(body).toEqual({ success: true, payload: [] });
+                expect(beeswax.request.calls.count()).toBe(1);
+            }).catch(function(error) {
+                expect(error).not.toBeDefined();
+            }).done(done);
+        });
+        
+        it('should reject if one of the requests fails', function(done) {
+            beeswax.request.and.callFake(function(method, opts) {
+                var resp = { success: true, payload: [] }, i;
+                
+                if (opts.body.offset >= 100) {
+                    return Promise.reject('too many requests :(');
+                } else {
+                    for (i = opts.body.offset; i < opts.body.offset + 50; i++) {
+                        resp.payload.push({ id: i, name: 'item #' + i });
+                    }
+                }
+                return Promise.resolve(resp);
+            });
+
+            beeswax._queryAll('/rest/campaign', 'campaign_id', { campaign_name: 'foobar' }).then(function(body) {
+                expect(body).not.toBeDefined();
+            }).catch(function(error) {
+                expect(error).toEqual('too many requests :(');
+                expect(beeswax.request.calls.count()).toBe(3);
             }).done(done);
         });
     });

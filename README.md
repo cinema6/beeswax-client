@@ -59,7 +59,10 @@ You shouldn't need to call this method explicitly - it will be called automatica
 Send a GET request to fetch the entity with the given id.
 
 ### `beeswax.<entity>.query(body)`
-Send a GET request to fetch entities. `body` should be an object containing any fields to query by.
+Send a GET request to fetch entities. `body` should be an object containing any fields to query by. By default, Beeswax's API will fetch up to 50 records, starting with the oldest.
+
+### `beeswax.<entity>.queryAll(body)`
+Like `query()`, but recursively sends GET requests until all entities matching the query have been fetched.
 
 ### `beeswax.<entity>.create(body)`
 Send a POST request to create a new entity. `body` should be an object representing the new entity.
