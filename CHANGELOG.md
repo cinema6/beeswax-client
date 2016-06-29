@@ -1,5 +1,10 @@
 # beeswax-client change log
 
+## v0.4.0
+* *[v0.4.0]*
+    * [FEATURE]: Added `queryAll` method for recursively fetching all items.
+* *[/v0.4.0]*
+
 ## v0.3.0 
 
 * *[v0.3.0]*
