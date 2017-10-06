@@ -873,11 +873,11 @@ describe('BeeswaxClient', function() {
             spyOn(request,'post');
         });
 
-        it('rejects if there is no sourceUrl',function(done){
+        it('rejects if there is no sourceUrl or creativeContentBytes',function(done){
             beeswax.uploadCreativeAsset({})
             .then(done.fail, function(e){
                 expect(e.message)
-                .toEqual('uploadCreativeAsset params requires a sourceUrl property.');
+                .toEqual('uploadCreativeAsset params requires a sourceUrl or a creativeContentBytes property.');
             })
             .then(done);
         });
