@@ -23,11 +23,13 @@ var beeswax = new BeeswaxClient({
     creds: {
         email       : 'user@domain.com',    // required
         password    : '...'                 // required
-    }
+    },
+    useStrict: false // Default: true
 });
 ```
 
-The `apiRoot` will be used to construct request urls, and the `creds` will be used when authenticating.
+The `apiRoot` and `useStrict` will be used to construct request urls, and the `creds` will be used when authenticating.
+The `useStrict` parameter enables or disables strict mode in Beeswax API (it's either adding or removing `/strict` suffix from API endpoint URLs).
 
 The instantiated client will contain methods for performing CRUD operations on each supported entity:
 ```javascript
